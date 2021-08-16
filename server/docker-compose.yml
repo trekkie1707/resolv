@@ -1,0 +1,25 @@
+version: "3"
+services:
+  resolv:
+    build:
+      context: ./resolv
+      dockerfile: Dockerfile
+    container_name: resolv
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Change HOSTNAME to reflect your domain
+      - HOSTNAME=localhost
+      # Change these values if you have a signed cert
+      - SSL_CERT_PATH=/etc/nginx/ssl/ca-cert.pem
+      - SSL_KEY_PATH=/etc/nginx/ssl/ca-private-key.pem
+      # Client certificate for resolv (auto generated)
+      - SSL_RESOLV_CA=/etc/nginx/ssl/ca-cert.pem
+    volumes:
+      - ./resolv/templates:/etc/nginx/templates
+      - ./resolv/certs:/etc/nginx/ssl
+      - ./resolv/scripts:/etc/nginx/scripts
+      - ./resolv/entrypoint.d/genCerts.sh:/docker-entrypoint.d/genCerts.sh
+      - ./resolv/entrypoint.d/runFlask.sh:/docker-entrypoint.d/runFlask.sh
+    restart: always
